@@ -1,10 +1,6 @@
 # OmniPedia
 
-A Chrome/Brave extension that completes English Wikipedia articles.
-
-![OmniPedia injecting Spanish and French passages into the Heiko von der Leyen article](docs/screenshot.png) On any English article it finds the same article in other language editions, machine-translates their content, keeps only the passages whose information the English page does not have, and injects those passages inline — each one colour-coded by language, labelled "machine translated", and linked to its original. The whole pipeline runs automatically when an article loads.
-
-Example: on `en.wikipedia.org/wiki/Heiko_von_der_Leyen` it adds the ARTISS GmbH founding, the Hannover clinical-trials directorship, and the Orgenesis conflict-of-interest context from the Spanish and French editions — none of which the English article mentions.
+Chrome/Brave extension for English Wikipedia. It looks up the same article in other languages, translates those editions, and inserts only information that is not already on the English page. Each insertion is colour-coded by language, labelled machine translated, and linked to its source. It runs when an article loads.
 
 ## Install (Brave or Chrome)
 
@@ -22,7 +18,7 @@ Example: on `en.wikipedia.org/wiki/Heiko_von_der_Leyen` it adds the ARTISS GmbH 
 
 ## How it works
 
-1. Query the article's language links, then each linked edition's size; rank by size and take the top N above a 2,000-byte floor. The deep edition can be any language — for Heiko von der Leyen it is Spanish, not German.
+1. Query the article's language links, then each linked edition's size; rank by size and take the top N above a 2,000-byte floor. The deepest extra coverage can be any language.
 2. Fetch each chosen edition's Parsoid HTML and extract paragraphs and list items (tables, infoboxes, references and navigation are skipped).
 3. Translate section headings, match them to English sections via a canonical-heading synonym map; translate content in batches.
 4. Score each translated passage against a token index of the whole English page (prose plus infobox): a passage is injected when most of its content words are absent, or when it is on-topic but carries mostly new numbers and dates. Accepted passages join the index, so the same fact arriving from a second language is not injected twice.

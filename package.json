@@ -1,7 +1,7 @@
 {
   "name": "omnipedia",
   "version": "0.1.0",
-  "description": "Chrome/Brave extension: while you read Wikipedia in any language, inserts labelled translations of information that exists in other language editions but not on the page.",
+  "description": "Fills Wikipedia articles with labelled translations of facts that exist in other languages but not on the page you\u2019re reading.",
   "private": true,
   "license": "MIT",
   "homepage": "https://sal-9000.com/omnipedia",

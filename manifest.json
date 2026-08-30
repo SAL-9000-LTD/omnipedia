@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "OmniPedia",
   "version": "0.1.0",
-  "description": "While you read Wikipedia in any language, adds labelled translations of extra information from other language editions.",
+  "description": "Adds extra facts from other Wikipedia languages onto the article you\u2019re reading.",
   "permissions": [
     "storage"
   ],

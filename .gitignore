@@ -1,0 +1,5 @@
+node_modules/
+smoke/profile/
+smoke/last-run.png
+package-lock.json
+.DS_Store

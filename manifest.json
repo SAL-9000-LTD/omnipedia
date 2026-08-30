@@ -2,16 +2,22 @@
   "manifest_version": 3,
   "name": "OmniPedia",
   "version": "0.1.0",
-  "description": "Completes English Wikipedia articles with auto-translated information found only in other language editions.",
-  "permissions": ["storage"],
+  "description": "Inserts labelled translations of information from other Wikipedia languages when it is missing from the English article.",
+  "permissions": [
+    "storage"
+  ],
   "host_permissions": [
     "https://*.wikipedia.org/*",
     "https://translate.googleapis.com/*"
   ],
-  "background": { "service_worker": "background.js" },
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
-      "matches": ["https://en.wikipedia.org/wiki/*"],
+      "matches": [
+        "https://en.wikipedia.org/wiki/*"
+      ],
       "js": [
         "content/lib.js",
         "content/wiki.js",
@@ -19,9 +25,14 @@
         "content/inject.js",
         "content/main.js"
       ],
-      "css": ["content/content.css"],
+      "css": [
+        "content/content.css"
+      ],
       "run_at": "document_idle"
     }
   ],
-  "action": { "default_popup": "popup/popup.html", "default_title": "OmniPedia" }
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "OmniPedia"
+  }
 }

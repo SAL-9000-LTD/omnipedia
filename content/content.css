@@ -1,0 +1,67 @@
+.omni-block {
+  --omni-c: #b8860b;
+  border-left: 3px solid var(--omni-c);
+  background: color-mix(in srgb, var(--omni-c) 8%, transparent);
+  padding: 0.5em 0.9em;
+  margin: 0.7em 0;
+  border-radius: 3px;
+}
+
+.omni-block-head {
+  font-size: 0.78em;
+  opacity: 0.75;
+  margin-bottom: 0.25em;
+}
+
+.omni-block-head a {
+  color: inherit;
+}
+
+.omni-tail-group h3 {
+  margin-top: 1em;
+}
+
+html.omni-hidden .omni-block,
+html.omni-hidden .omni-tail {
+  display: none;
+}
+
+.omni-pill {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  z-index: 10000;
+  background: #202122;
+  color: #fff;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font: 13px/1.4 system-ui, sans-serif;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  max-width: 560px;
+}
+
+.omni-pill strong {
+  font-weight: 600;
+}
+
+.omni-pill button {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  border-radius: 999px;
+  padding: 2px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.omni-pill button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.omni-pill.omni-error {
+  background: #7a2320;
+}

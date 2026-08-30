@@ -1,47 +1,35 @@
 # OmniPedia
 
-A Chrome/Brave extension for Wikipedia. While you read an article in any language, it finds extra information in other language editions, translates it into the language you are viewing, and inserts only what that page does not already have. Each insertion is colour-coded by language, labelled machine translated, and linked to the original. It runs when an article loads.
+**Other languages of Wikipedia know things this page doesn’t.**
+OmniPedia brings those facts onto the article you’re reading.
 
-## Install (Brave or Chrome)
+It works in any language. Read English, and it fills gaps from French, Spanish, Japanese, and the rest. Read German, and English (and everyone else) can fill the gaps. New passages are translated into the language in front of you, colour-coded, labelled *machine translated*, and linked to the original.
 
-1. `git clone https://github.com/SAL-9000-LTD/omnipedia.git` (or download and unzip the repo).
-2. Open `brave://extensions` (or `chrome://extensions`).
-3. Turn on "Developer mode" (top right).
-4. Click "Load unpacked" and choose the cloned folder.
-5. Open any Wikipedia article. The pill in the bottom-right corner shows progress and results.
+It runs by itself when an article opens.
 
-## Using it
+---
 
-- **Pill** (bottom right): live status, result summary, Hide/Show for the injected blocks, and a re-run button that ignores the cache.
-- **Popup** (toolbar icon): auto-run toggle, max languages (default 5), novelty threshold (higher injects more), run/re-run buttons, clear cache.
-- Injected blocks sit at the end of the matching section on the page; material with no matching section goes into "Additional information from other language editions" placed before References.
+## Add it to Brave or Chrome
 
-## How it works
+1. Download this repo (or `git clone https://github.com/SAL-9000-LTD/omnipedia.git`).
+2. Go to `brave://extensions` (or `chrome://extensions`).
+3. Turn on **Developer mode**.
+4. Click **Load unpacked** and choose the OmniPedia folder.
+5. Open any Wikipedia article.
 
-1. Query the article's language links, then each linked edition's size; rank by size and take the top N above a 2,000-byte floor. The deepest extra coverage can be any language.
-2. Fetch each chosen edition's Parsoid HTML and extract paragraphs and list items (tables, infoboxes, references and navigation are skipped).
-3. Translate section headings, match them to sections on the page you are reading via a canonical-heading synonym map; translate content in batches.
-4. Score each translated passage against a token index of the whole page you are reading (prose plus infobox): a passage is injected when most of its content words are absent, or when it is on-topic but carries mostly new numbers and dates. Accepted passages join the index, so the same fact arriving from a second language is not injected twice.
-5. Results are cached per article keyed on every edition's revision id, so revisits are instant and edits anywhere invalidate cleanly.
+A small pill appears in the corner while it works. That’s all.
 
-Translation uses the browser's on-device Translator API when a language pack is available (Chrome 138+), otherwise Google's free web translate endpoint. On the web path, article text is sent to Google. The endpoint is unofficial; if it ever breaks, the pill reports the failure and the page is simply left unmodified.
+---
 
-## Development
+## What you’ll see
 
-- `npm test` — unit tests for the scoring/matching/parsing core (`content/lib.js`).
-- `npm run smoke` — full end-to-end run: loads the extension into Playwright's Chrome for Testing, drives a live Wikipedia article, asserts injected blocks and cache replay, screenshots to `smoke/last-run.png`. Pass a different article URL as an argument; set `OMNI_CHROME` to a browser binary (verified against Brave), `OMNI_HEADED=1` to watch.
+- Extra passages in the article, only where this language was missing something.
+- A colour per language, a “machine translated” label, and a link back to the source.
+- Hide / Show if you want the page quiet again.
+- The toolbar icon, if you ever want to pause auto-run or try again.
 
-Layout: `background.js` (fetch proxy + batch translator; note the endpoint requires `client`/`sl`/`tl` as query parameters — in the POST body it returns 405), `content/lib.js` (pure logic, node-testable), `content/wiki.js` (API + extraction), `content/translate.js` (engine selection), `content/inject.js` (DOM/UI), `content/main.js` (orchestrator, per-language 150s watchdog, 60-candidate cap), `popup/`.
+---
 
-## Known limits (v1)
+Built by [SAL-9000 Ltd](https://sal-9000.com). MIT licence.
 
-- Section-level placement: a passage lands at the end of the best-matching section, which can put career detail under "Early life" when the source edition keeps one big "Biography" section.
-- Machine translation quality is what it is; occasional garbled sentences come straight from the translator.
-- Infoboxes and tables in foreign editions are not mined yet (the page infobox does feed the coverage index).
-- Desktop site only.
-
-## License
-
-MIT — see [LICENSE](LICENSE). Injected article content comes from Wikipedia and remains [CC BY-SA](https://creativecommons.org/licenses/by-sa/4.0/); every injected block links to its source article.
-
-Built by [SAL-9000 Ltd](https://sal-9000.com), makers of [Paster](https://sal-9000.com/paster).
+Wikipedia text stays [CC BY-SA](https://creativecommons.org/licenses/by-sa/4.0/).

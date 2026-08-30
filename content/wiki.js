@@ -6,6 +6,14 @@ const OmniWiki = (() => {
     '.mw-references-wrap, ol.references, .refbegin, figure, .thumb, .hatnote, .ambox, .toc, #toc, ' +
     '.catlinks, .printfooter, .mw-authority-control, .omni-block, .omni-tail, [role="navigation"]';
 
+  function langFromHost(hostname) {
+    const m = String(hostname).match(/^([a-z0-9-]+)\.wikipedia\.org$/i);
+    if (!m) return null;
+    const lang = m[1].toLowerCase();
+    if (lang === 'www' || lang === 'm') return null;
+    return lang;
+  }
+
   function bgFetch(url, accept) {
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage({ type: 'fetch', url, accept }, res => {
@@ -22,8 +30,8 @@ const OmniWiki = (() => {
     return JSON.parse(await bgFetch(url, 'application/json'));
   }
 
-  async function getLanglinks(title) {
-    const d = await api('en.wikipedia.org', {
+  async function getLanglinks(lang, title) {
+    const d = await api(`${lang}.wikipedia.org`, {
       action: 'query', titles: title, prop: 'langlinks', lllimit: '500', redirects: '1',
     });
     const page = d.query && d.query.pages && d.query.pages[0];
@@ -57,7 +65,7 @@ const OmniWiki = (() => {
   }
 
   // Flat document-order walk that works on both Parsoid HTML (foreign
-  // editions) and the live rendered English DOM.
+  // editions) and the live rendered page DOM.
   function extractSections(container) {
     const sections = [{ heading: null, level: 2, blocks: [], headingEl: null }];
     for (const el of container.querySelectorAll('h2, h3, h4, p, li')) {
@@ -77,7 +85,7 @@ const OmniWiki = (() => {
     return sections;
   }
 
-  function englishSections() {
+  function pageSections() {
     const content = document.querySelector('#mw-content-text .mw-parser-output')
       || document.querySelector('#mw-content-text');
     const sections = extractSections(content);
@@ -86,9 +94,9 @@ const OmniWiki = (() => {
     return { content, sections, h2s };
   }
 
-  // Broad coverage text for the novelty index: everything the English page
-  // already states (prose, infobox, captions), minus reference lists and
-  // navboxes whose text would mask genuinely missing facts.
+  // Broad coverage text for the novelty index: everything the page you are
+  // reading already states (prose, infobox, captions), minus reference lists
+  // and navboxes whose text would mask genuinely missing facts.
   function indexText(container) {
     const clone = container.cloneNode(true);
     clone.querySelectorAll('.reflist, .mw-references-wrap, ol.references, .refbegin, .navbox, ' +
@@ -97,5 +105,5 @@ const OmniWiki = (() => {
     return OmniLib.cleanText(clone.textContent);
   }
 
-  return { getLanglinks, getInfo, getArticleHTML, extractSections, englishSections, indexText };
+  return { langFromHost, getLanglinks, getInfo, getArticleHTML, extractSections, pageSections, indexText };
 })();

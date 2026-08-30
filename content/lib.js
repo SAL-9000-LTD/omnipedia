@@ -64,7 +64,7 @@ const OmniLib = (() => {
   }
 
   // A block is worth injecting when most of its vocabulary is absent from the
-  // English article, or when it is on-topic but carries mostly new figures.
+  // article you are reading, or when it is on-topic but carries mostly new figures.
   function isNovel(text, index, threshold) {
     const t = tokenize(text);
     const cov = coverage(t, index);
@@ -76,16 +76,31 @@ const OmniLib = (() => {
   }
 
   const HEADING_GROUPS = {
-    life: ['life', 'biography', 'early life', 'early years', 'childhood', 'youth', 'life and career'],
-    career: ['career', 'professional career', 'medical career', 'academic career', 'professional life'],
-    works: ['works', 'work', 'oeuvre', 'publications', 'selected works', 'selected publications', 'writings'],
-    'personal life': ['personal life', 'private life', 'family', 'personal', 'marriage and family'],
-    awards: ['awards', 'honours', 'honors', 'awards and honours', 'awards and honors', 'recognition', 'prizes', 'distinctions'],
-    education: ['education', 'studies', 'education and training'],
-    death: ['death', 'death and legacy', 'later life and death'],
+    life: ['life', 'biography', 'early life', 'early years', 'childhood', 'youth', 'life and career',
+      'leben', 'biografie', 'biographie', 'biografía', 'biografia', 'vita', 'leven', 'биография'],
+    career: ['career', 'professional career', 'medical career', 'academic career', 'professional life',
+      'karriere', 'carrière', 'carrera', 'carriera', 'loopbaan', 'карьера'],
+    works: ['works', 'work', 'oeuvre', 'publications', 'selected works', 'selected publications', 'writings',
+      'werke', 'werk', 'obras', 'opere', 'werken', 'работы', 'труды'],
+    'personal life': ['personal life', 'private life', 'family', 'personal', 'marriage and family',
+      'privatleben', 'vie privée', 'vida personal', 'vita privata', 'privéleven', 'личная жизнь'],
+    awards: ['awards', 'honours', 'honors', 'awards and honours', 'awards and honors', 'recognition', 'prizes', 'distinctions',
+      'auszeichnungen', 'ehrungen', 'récompenses', 'premios', 'premi', 'onderscheidingen', 'награды'],
+    education: ['education', 'studies', 'education and training',
+      'ausbildung', 'bildung', 'études', 'educación', 'istruzione', 'opleiding', 'образование'],
+    death: ['death', 'death and legacy', 'later life and death',
+      'tod', 'mort', 'muerte', 'morte', 'overlijden', 'смерть'],
     __skip: ['references', 'notes', 'citations', 'footnotes', 'sources', 'external links', 'see also',
       'further reading', 'bibliography', 'literature', 'web links', 'links', 'gallery', 'commons',
-      'individual evidence', 'individual records'],
+      'individual evidence', 'individual records',
+      'einzelnachweise', 'weblinks', 'literatur', 'siehe auch', 'anmerkungen', 'quellen', 'fußnoten', 'fussnoten',
+      'références', 'notes et références', 'liens externes', 'voir aussi', 'bibliographie', 'annexes',
+      'referencias', 'enlaces externos', 'véase también', 'bibliografía', 'notas',
+      'note', 'bibliografia', 'collegamenti esterni', 'voci correlate',
+      'referências', 'ligações externas', 'ver também',
+      'referenties', 'externe links', 'zie ook', 'literatuur', 'voetnoten', 'bronnen',
+      'przypisy', 'linki zewnętrzne', 'zobacz też',
+      'примечания', 'ссылки', 'см. также', 'литература'],
   };
 
   const HEADING_LOOKUP = (() => {
@@ -117,19 +132,19 @@ const OmniLib = (() => {
     return n >= 5 && a.slice(0, 5) === b.slice(0, 5);
   }
 
-  function matchHeading(heading, englishHeadings) {
+  function matchHeading(heading, pageHeadings) {
     const key = headingKey(heading);
     if (key === '__skip') return null;
-    for (let i = 0; i < englishHeadings.length; i++) {
-      if (englishHeadings[i].key === key) return i;
+    for (let i = 0; i < pageHeadings.length; i++) {
+      if (pageHeadings[i].key === key) return i;
     }
     const ht = [...headingTokens(key)];
     if (ht.length === 0) return null;
     let best = null;
     let bestScore = 0;
-    for (let i = 0; i < englishHeadings.length; i++) {
-      if (englishHeadings[i].key === '__skip') continue;
-      const et = [...headingTokens(englishHeadings[i].key)];
+    for (let i = 0; i < pageHeadings.length; i++) {
+      if (pageHeadings[i].key === '__skip') continue;
+      const et = [...headingTokens(pageHeadings[i].key)];
       if (et.length === 0) continue;
       let hits = 0;
       for (const t of ht) if (et.some(e => tokensAlike(t, e))) hits++;

@@ -37,31 +37,31 @@ async function postForm(url, params, retries = 3) {
   }
 }
 
-async function translateBatch(texts, from) {
+async function translateBatch(texts, from, to) {
   // client/sl/tl must be query params — in the POST body the endpoint 405s.
-  const url = `${GTX_T}?` + new URLSearchParams({ client: 'gtx', sl: from, tl: 'en' });
+  const url = `${GTX_T}?` + new URLSearchParams({ client: 'gtx', sl: from, tl: to });
   const params = new URLSearchParams();
   for (const t of texts) params.append('q', t);
   const raw = await postForm(url, params);
   return OmniLib.gtxParseT(raw, texts.length);
 }
 
-async function translateSingle(text, from) {
-  const params = new URLSearchParams({ client: 'gtx', sl: from, tl: 'en', dt: 't', q: text });
+async function translateSingle(text, from, to) {
+  const params = new URLSearchParams({ client: 'gtx', sl: from, tl: to, dt: 't', q: text });
   const raw = await postForm(GTX_SINGLE, params);
   return OmniLib.gtxParseSingle(raw);
 }
 
-async function translateItems(items, from) {
+async function translateItems(items, from, to) {
   const out = {};
   for (const batch of OmniLib.packBatches(items, 3600)) {
     try {
-      const translated = await translateBatch(batch.map(i => i.text), from);
+      const translated = await translateBatch(batch.map(i => i.text), from, to);
       batch.forEach((item, i) => { out[item.id] = translated[i]; });
     } catch (e) {
       for (const item of batch) {
         try {
-          out[item.id] = await translateSingle(item.text, from);
+          out[item.id] = await translateSingle(item.text, from, to);
         } catch {
           out[item.id] = null;
         }
@@ -79,7 +79,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true;
   }
   if (msg.type === 'translate') {
-    translateItems(msg.items, msg.from)
+    translateItems(msg.items, msg.from, msg.to)
       .then(map => sendResponse({ ok: true, map }))
       .catch(e => sendResponse({ ok: false, error: String(e) }));
     return true;

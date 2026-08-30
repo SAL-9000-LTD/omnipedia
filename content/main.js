@@ -7,7 +7,15 @@
   if (!document.body || !document.body.classList.contains('ns-0')) return;
   if (location.pathname === '/wiki/Main_Page') return;
 
-  const displayNames = new Intl.DisplayNames(['en'], { type: 'language' });
+  const viewLang = OmniWiki.langFromHost(location.hostname);
+  if (!viewLang) return;
+
+  let displayNames;
+  try {
+    displayNames = new Intl.DisplayNames([viewLang, 'en'], { type: 'language' });
+  } catch {
+    displayNames = new Intl.DisplayNames(['en'], { type: 'language' });
+  }
   const langName = code => {
     try { return displayNames.of(code) || code; } catch { return code; }
   };
@@ -36,19 +44,20 @@
       const title = decodeURIComponent(location.pathname.slice('/wiki/'.length));
 
       OmniUI.status('finding other language editions…');
-      const langlinks = await OmniWiki.getLanglinks(title);
+      const langlinks = await OmniWiki.getLanglinks(viewLang, title);
       if (!langlinks.length) return finish([], [], null, false, 'no other language editions');
 
-      const enInfo = await OmniWiki.getInfo('en', title).catch(() => null);
+      const pageInfo = await OmniWiki.getInfo(viewLang, title).catch(() => null);
       const infos = (await mapLimit(langlinks.slice(0, 40), 6,
-        l => OmniWiki.getInfo(l.lang, l.title).catch(() => null))).filter(Boolean);
+        l => OmniWiki.getInfo(l.lang, l.title).catch(() => null)))
+        .filter(i => i && i.lang !== viewLang);
       const sources = OmniLib.pickSources(infos, S);
       if (!sources.length) return finish([], [], null, false, 'other editions are too small to mine');
       log('sources:', sources.map(s => `${s.lang}(${s.length}b)`).join(' '));
 
-      const cacheKey = `cache:${title}`;
+      const cacheKey = `cache:${viewLang}:${title}`;
       const fingerprint = JSON.stringify([
-        enInfo && enInfo.revid,
+        pageInfo && pageInfo.revid,
         sources.map(s => [s.lang, s.revid]),
         S.noveltyThreshold, S.maxLanguages, S.minSourceBytes,
       ]);
@@ -61,10 +70,10 @@
         }
       }
 
-      const eng = OmniWiki.englishSections();
-      const engHeadings = eng.h2s.map(s => ({ key: s.key }));
+      const page = OmniWiki.pageSections();
+      const pageHeadings = page.h2s.map(s => ({ key: s.key }));
       const index = OmniLib.createIndex();
-      OmniLib.indexAdd(index, OmniWiki.indexText(eng.content));
+      OmniLib.indexAdd(index, OmniWiki.indexText(page.content));
       OmniLib.indexAdd(index, document.title);
 
       const plan = [];
@@ -84,7 +93,7 @@
         const headingItems = [];
         sections.forEach((s, i) => { if (s.heading) headingItems.push({ id: 'h' + i, text: s.heading }); });
         const hMap = headingItems.length
-          ? await OmniTranslate.translateItems(headingItems, src.lang, engineNote)
+          ? await OmniTranslate.translateItems(headingItems, src.lang, viewLang, engineNote)
           : {};
         const meta = sections.map((s, i) => {
           const th = s.heading ? OmniLib.cleanText(hMap['h' + i] || s.heading) : null;
@@ -92,7 +101,7 @@
           return {
             th,
             skip: key === '__skip',
-            target: th && key !== '__skip' ? OmniLib.matchHeading(th, engHeadings) : null,
+            target: th && key !== '__skip' ? OmniLib.matchHeading(th, pageHeadings) : null,
           };
         });
 
@@ -112,7 +121,7 @@
         OmniUI.status(`translating ${cands.length} passages from ${name}… ${progress}`);
         const t1 = Date.now();
         const tMap = await OmniTranslate.translateItems(
-          cands.map(c => ({ id: c.id, text: c.text })), src.lang, engineNote);
+          cands.map(c => ({ id: c.id, text: c.text })), src.lang, viewLang, engineNote);
         log(`${src.lang}: translated ${cands.length} passages in ${Math.round((Date.now() - t1) / 1000)}s`);
 
         const entries = [];
@@ -174,11 +183,11 @@
 
   function render(plan) {
     OmniUI.reset();
-    const eng = OmniWiki.englishSections();
+    const page = OmniWiki.pageSections();
     for (const p of plan) {
       const block = OmniUI.makeBlock(p);
-      if (p.target != null && eng.h2s[p.target]) OmniUI.insertAtSectionEnd(eng, p.target, block);
-      else OmniUI.tailAdd(eng, p, block);
+      if (p.target != null && page.h2s[p.target]) OmniUI.insertAtSectionEnd(page, p.target, block);
+      else OmniUI.tailAdd(page, p, block);
     }
   }
 
@@ -187,7 +196,7 @@
     if (emptyReason) {
       text = emptyReason;
     } else if (!plan.length) {
-      text = 'nothing missing — the English article already covers the other editions';
+      text = 'nothing missing — this article already covers the other editions';
     } else {
       const perLang = {};
       for (const p of plan) perLang[p.langName] = (perLang[p.langName] || 0) + 1;

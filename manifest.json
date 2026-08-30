@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "OmniPedia",
   "version": "0.1.0",
-  "description": "Adds extra facts from other Wikipedia languages onto the article you\u2019re reading.",
+  "description": "While you read Wikipedia in any language, adds labelled translations of extra information from other language editions.",
   "permissions": [
     "storage"
   ],
@@ -16,7 +16,7 @@
   "content_scripts": [
     {
       "matches": [
-        "https://en.wikipedia.org/wiki/*"
+        "https://*.wikipedia.org/wiki/*"
       ],
       "js": [
         "content/lib.js",

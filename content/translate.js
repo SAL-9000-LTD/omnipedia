@@ -6,24 +6,31 @@
 const OmniTranslate = (() => {
   const builtins = new Map();
 
-  async function builtinFor(lang) {
-    if (builtins.has(lang)) return builtins.get(lang);
+  // Wikipedia edition codes that are not Translator / gtx language codes.
+  function translateCode(wikiLang) {
+    if (wikiLang === 'simple') return 'en';
+    return wikiLang;
+  }
+
+  async function builtinFor(from, to) {
+    const key = `${from}|${to}`;
+    if (builtins.has(key)) return builtins.get(key);
     let t = null;
     try {
       if (typeof Translator !== 'undefined' && Translator.availability) {
-        const a = await Translator.availability({ sourceLanguage: lang, targetLanguage: 'en' });
-        if (a === 'available') t = await Translator.create({ sourceLanguage: lang, targetLanguage: 'en' });
+        const a = await Translator.availability({ sourceLanguage: from, targetLanguage: to });
+        if (a === 'available') t = await Translator.create({ sourceLanguage: from, targetLanguage: to });
       }
     } catch {
       t = null;
     }
-    builtins.set(lang, t);
+    builtins.set(key, t);
     return t;
   }
 
-  function bgTranslate(items, from) {
+  function bgTranslate(items, from, to) {
     return new Promise(resolve => {
-      chrome.runtime.sendMessage({ type: 'translate', items, from }, res => {
+      chrome.runtime.sendMessage({ type: 'translate', items, from, to }, res => {
         if (chrome.runtime.lastError || !res || !res.ok) resolve(null);
         else resolve(res.map);
       });
@@ -31,9 +38,16 @@ const OmniTranslate = (() => {
   }
 
   // items: [{id, text}] -> {id: translatedText | null}
-  async function translateItems(items, from, note) {
+  async function translateItems(items, from, to, note) {
+    const sl = translateCode(from);
+    const tl = translateCode(to);
+    if (sl === tl) {
+      const out = {};
+      for (const item of items) out[item.id] = item.text;
+      return out;
+    }
     const out = {};
-    const bi = await builtinFor(from);
+    const bi = await builtinFor(sl, tl);
     if (bi) {
       note.engine = 'on-device';
       for (const item of items) {
@@ -47,7 +61,7 @@ const OmniTranslate = (() => {
     }
     note.engine = 'Google web endpoint';
     for (const pack of OmniLib.packBatches(items, 3600)) {
-      const map = await bgTranslate(pack, from);
+      const map = await bgTranslate(pack, sl, tl);
       if (map) Object.assign(out, map);
       else pack.forEach(i => { out[i.id] = null; });
     }

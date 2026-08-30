@@ -7,7 +7,7 @@
   "homepage": "https://sal-9000.com/omnipedia",
   "repository": {
     "type": "git",
-    "url": "https://github.com/SAL-9000-com/omnipedia.git"
+    "url": "https://github.com/SAL-9000-LTD/omnipedia.git"
   },
   "scripts": {
     "test": "node --test tests/*.test.mjs",

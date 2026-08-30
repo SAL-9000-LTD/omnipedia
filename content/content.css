@@ -1,10 +1,12 @@
 .omni-block {
   --omni-c: #b8860b;
   border-left: 3px solid var(--omni-c);
-  background: color-mix(in srgb, var(--omni-c) 8%, transparent);
+  background-color: color-mix(in srgb, var(--omni-c) 8%, var(--background-color-base, #fff));
+  color: var(--color-base, #202122);
   padding: 0.5em 0.9em;
   margin: 0.7em 0;
   border-radius: 3px;
+  color-scheme: inherit;
 }
 
 .omni-block-head {
@@ -14,7 +16,11 @@
 }
 
 .omni-block-head a {
-  color: inherit;
+  color: var(--color-progressive, inherit);
+}
+
+.omni-tail {
+  color-scheme: inherit;
 }
 
 .omni-tail-group h3 {
@@ -31,6 +37,7 @@ html.omni-hidden .omni-tail {
   bottom: 18px;
   right: 18px;
   z-index: 10000;
+  color-scheme: dark;
   background: #202122;
   color: #fff;
   border-radius: 999px;
@@ -64,4 +71,32 @@ html.omni-hidden .omni-tail {
 
 .omni-pill.omni-error {
   background: #7a2320;
+}
+
+@media screen {
+  html.skin-theme-clientpref-night .omni-block {
+    background-color: color-mix(in srgb, var(--omni-c) 16%, var(--background-color-base, #101418));
+    color: var(--color-base, #f8f9fa);
+    color-scheme: dark;
+  }
+  html.skin-theme-clientpref-night .omni-tail {
+    color: var(--color-base, #f8f9fa);
+    color-scheme: dark;
+  }
+  html.skin-theme-clientpref-day .omni-block,
+  html.skin-theme-clientpref-day .omni-tail {
+    color-scheme: light;
+  }
+}
+
+@media screen and (prefers-color-scheme: dark) {
+  html.skin-theme-clientpref-os .omni-block {
+    background-color: color-mix(in srgb, var(--omni-c) 16%, var(--background-color-base, #101418));
+    color: var(--color-base, #f8f9fa);
+    color-scheme: dark;
+  }
+  html.skin-theme-clientpref-os .omni-tail {
+    color: var(--color-base, #f8f9fa);
+    color-scheme: dark;
+  }
 }

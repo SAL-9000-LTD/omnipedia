@@ -11,6 +11,30 @@ const OmniUI = (() => {
   const EXTRA = ['#7d3ca3', '#0f766e', '#946800', '#3557a6', '#8a3324'];
   const assigned = new Map();
 
+  function wikiColorScheme() {
+    const cl = document.documentElement.classList;
+    if (cl.contains('skin-theme-clientpref-night')) return 'dark';
+    if (cl.contains('skin-theme-clientpref-day')) return 'light';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  function applyColorScheme(el) {
+    el.style.colorScheme = el.classList.contains('omni-pill') ? 'dark' : wikiColorScheme();
+  }
+
+  let themeWatch = false;
+  function watchTheme() {
+    if (themeWatch) return;
+    themeWatch = true;
+    const restyle = () => {
+      document.querySelectorAll('.omni-block, .omni-tail, .omni-pill').forEach(applyColorScheme);
+    };
+    new MutationObserver(restyle).observe(document.documentElement, {
+      attributes: true, attributeFilter: ['class'],
+    });
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', restyle);
+  }
+
   function colorFor(lang) {
     if (LANG_COLORS[lang]) return LANG_COLORS[lang];
     if (!assigned.has(lang)) assigned.set(lang, EXTRA[assigned.size % EXTRA.length]);
@@ -38,7 +62,9 @@ const OmniUI = (() => {
     rerunBtn.title = 'Re-run, ignoring the cache';
     rerunBtn.addEventListener('click', () => handlers.rerun());
     pill.append(brand, statusEl, hideBtn, rerunBtn);
+    applyColorScheme(pill);
     document.body.append(pill);
+    watchTheme();
   }
 
   function status(t) {
@@ -60,6 +86,7 @@ const OmniUI = (() => {
     div.className = 'omni-block';
     div.dataset.lang = lang;
     div.style.setProperty('--omni-c', colorFor(lang));
+    applyColorScheme(div);
     const head = document.createElement('div');
     head.className = 'omni-block-head';
     const label = document.createElement('span');
@@ -94,6 +121,7 @@ const OmniUI = (() => {
     if (tail) return tail;
     tail = document.createElement('div');
     tail.className = 'omni-tail';
+    applyColorScheme(tail);
     const h = document.createElement('h2');
     h.textContent = 'Additional information from other language editions';
     tail.append(h);

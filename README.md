@@ -14,7 +14,7 @@ A Chrome/Brave extension for Wikipedia. While you read an article in any languag
 
 - **Pill** (bottom right): live status, result summary, Hide/Show for the injected blocks, and a re-run button that ignores the cache.
 - **Popup** (toolbar icon): auto-run toggle, max languages (default 5), novelty threshold (higher injects more), run/re-run buttons, clear cache.
-- Injected blocks sit at the end of the matching English section; material with no matching section goes into "Additional information from other language editions" placed before References.
+- Injected blocks sit at the end of the matching section on the page; material with no matching section goes into "Additional information from other language editions" placed before References.
 
 ## How it works
 

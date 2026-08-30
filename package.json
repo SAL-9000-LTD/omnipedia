@@ -1,7 +1,7 @@
 {
   "name": "omnipedia",
   "version": "0.1.0",
-  "description": "Browser extension that completes English Wikipedia articles with auto-translated information found only in other language editions.",
+  "description": "Chrome/Brave extension that inserts labelled translations of information present in other Wikipedia languages but missing from the English article.",
   "private": true,
   "license": "MIT",
   "homepage": "https://sal-9000.com/omnipedia",

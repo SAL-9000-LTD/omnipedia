@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { font: 13px/1.5 system-ui, sans-serif; width: 300px; margin: 0; padding: 12px 14px; }
+  h1 { font-size: 14px; margin: 0 0 10px; }
+  label { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+  label.col { flex-direction: column; align-items: stretch; gap: 2px; }
+  input[type=number] { width: 60px; }
+  .row { display: flex; gap: 8px; margin-top: 12px; }
+  button { flex: 1; padding: 5px 8px; cursor: pointer; }
+  .note { color: #666; font-size: 11px; margin-top: 10px; }
+  #saved { color: #2e7d32; font-size: 11px; visibility: hidden; font-weight: normal; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #202122; color: #eee; }
+    .note { color: #aaa; }
+  }
+</style>
+</head>
+<body>
+<h1>OmniPedia <span id="saved">saved</span></h1>
+<label><input type="checkbox" id="autoRun"> Run automatically on articles</label>
+<label>Max languages <input type="number" id="maxLanguages" min="1" max="10"></label>
+<label class="col">
+  <span>Novelty threshold (higher = inject more) <b id="thVal"></b></span>
+  <input type="range" id="noveltyThreshold" min="0.2" max="0.8" step="0.05">
+</label>
+<div class="row">
+  <button id="runNow">Run now</button>
+  <button id="rerun">Re-run fresh</button>
+</div>
+<div class="row"><button id="clearCache">Clear cache</button></div>
+<p class="note">Translation runs on-device when the browser supports it; otherwise article text is sent to Google's free translate endpoint.</p>
+<script src="../content/lib.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>

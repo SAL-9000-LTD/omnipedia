@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "OmniPedia",
   "version": "0.1.0",
-  "description": "Inserts labelled translations of information from other Wikipedia languages when it is missing from the English article.",
+  "description": "While you read Wikipedia in any language, adds labelled translations of extra information from other language editions.",
   "permissions": [
     "storage"
   ],

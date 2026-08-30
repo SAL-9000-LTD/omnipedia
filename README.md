@@ -8,7 +8,7 @@ Example: on `en.wikipedia.org/wiki/Heiko_von_der_Leyen` it adds the ARTISS GmbH 
 
 ## Install (Brave or Chrome)
 
-1. `git clone https://github.com/SAL-9000-com/omnipedia.git` (or download and unzip the repo).
+1. `git clone https://github.com/SAL-9000-LTD/omnipedia.git` (or download and unzip the repo).
 2. Open `brave://extensions` (or `chrome://extensions`).
 3. Turn on "Developer mode" (top right).
 4. Click "Load unpacked" and choose the cloned folder.
